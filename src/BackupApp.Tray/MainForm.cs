@@ -58,6 +58,7 @@ internal sealed class MainForm : Form
     {
         _app = app;
         Text = "BackupApp";
+        Icon = AppIcon.Value;
         StartPosition = FormStartPosition.CenterScreen;
         ClientSize = new Size(900, 560);
         MinimumSize = new Size(700, 450);

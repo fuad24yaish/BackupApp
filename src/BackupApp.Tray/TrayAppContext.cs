@@ -59,7 +59,7 @@ internal sealed class TrayAppContext : ApplicationContext
 
         _trayIcon = new NotifyIcon
         {
-            Icon = SystemIcons.Shield,
+            Icon = AppIcon.Value,
             Text = "BackupApp — watching for changes",
             ContextMenuStrip = menu,
             Visible = true

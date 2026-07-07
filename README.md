@@ -4,6 +4,27 @@ A Windows tray application that watches chosen root folders and keeps a **comple
 version history** of every file change inside them — every create, edit, rename and
 delete is recorded, and any past version can be browsed and restored.
 
+## Install (for end users)
+
+Download **`BackupApp-Setup-<version>.exe`** and double-click it. The installer:
+
+- needs **no administrator rights** and shows no UAC prompt (it installs just for
+  the current user),
+- requires **no .NET install** — the runtime is bundled inside the app,
+- adds a Start Menu shortcut (and, if you tick the box, a desktop shortcut),
+- can **start BackupApp automatically when you sign in** (ticked by default),
+- registers a normal entry in *Settings → Apps* so it can be uninstalled later.
+
+After it finishes, BackupApp starts and sits in the system tray (look for its icon
+near the clock). Double-click the tray icon to open it and add folders to watch.
+
+> Because the installer isn't code-signed, Windows SmartScreen may show a blue
+> *"Windows protected your PC"* notice the first time. Click **More info →
+> Run anyway**. (Signing it with a code-signing certificate removes this warning.)
+
+Uninstalling leaves your backup history and settings in place, so reinstalling
+keeps everything; delete `%LOCALAPPDATA%\BackupApp` by hand if you truly want it gone.
+
 ## How it works
 
 ```
@@ -147,12 +168,40 @@ disabled entirely on the Retention tab.
 
 ## Building
 
+Requires the **.NET 10 SDK**. To build and run during development:
+
 ```
 dotnet build BackupApp.slnx
-dotnet publish src/BackupApp.Tray -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true
+dotnet run --project src/BackupApp.Tray
 ```
 
-Requires the .NET 10 SDK.
+### Building the installer
+
+One command publishes a self-contained single-file exe and wraps it in the
+Setup.exe:
+
+```
+powershell -ExecutionPolicy Bypass -File installer/build.ps1 -Version 1.0.0
+```
+
+The result is `installer/Output/BackupApp-Setup-1.0.0.exe` (~46 MB, self-contained
+so the target PC needs nothing preinstalled).
+
+This needs **Inno Setup 6** (one-time):
+
+```
+winget install --id JRSoftware.InnoSetup -e
+```
+
+The packaging lives in `installer/`:
+
+```
+installer/
+  BackupApp.iss     Inno Setup script (per-user install, shortcuts, startup, uninstaller)
+  build.ps1         publish + compile the installer in one step
+  make-icon.ps1     regenerates assets/app.ico (already committed; rarely needed)
+  assets/app.ico    application icon (embedded in the exe, used by shortcuts)
+```
 
 ## Known limits
 
